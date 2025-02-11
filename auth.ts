@@ -72,6 +72,7 @@ export const config = {
     async jwt({ token, user, trigger, session }: any) {
       // Assign user fields to the token
       if (user) {
+        token.id = user.id;
         token.role = user.role;
 
         // If user has no name, use the email
@@ -84,10 +85,52 @@ export const config = {
             data: { name: token.name },
           });
         }
+
+        // If user signs in with items in cart, ensure cart items remain
+        if (trigger === 'signIn' || trigger === 'signUp') {
+          const cookiesObject = await cookies();
+          const sessionCartId = cookiesObject.get('sessionCartId')?.value;
+
+          if (sessionCartId) {
+            const sessionCart = await prisma.cart.findFirst({
+              where: { sessionCartId },
+            });
+
+            if (sessionCart) {
+              //Delete current user cart
+              await prisma.cart.deleteMany({
+                where: { userId: user.id },
+              });
+
+              // Assign new cart
+              await prisma.cart.update({
+                where: { id: sessionCart.id },
+                data: { userId: user.id },
+              });
+            }
+          }
+        }
       }
       return token;
     },
     authorized({ request, auth }: any) {
+      // Array of regex patterns of paths we want to protect
+      const protectedPaths = [
+        /\/shipping-address/,
+        /\/payment-method/,
+        /\/place-order/,
+        /\/profile/,
+        /\/user\/(.*)/,
+        /\/order\/(.*)/,
+        /\/admin/,
+      ];
+
+      // Get pathname from the req URL object
+      const { pathname } = request.nextUrl;
+
+      // Check if unauthenticated user is trying to access a protected path
+      if (!auth && protectedPaths.some((p) => p.test(pathname))) return false;
+
       // Check for session cart cookie
       if (!request.cookies.get('sessionCartId')) {
         // Generate new session cart id cookie
@@ -99,12 +142,12 @@ export const config = {
         // Create new response and add the new headers
         const response = NextResponse.next({
           request: {
-            headers: newRequestHeaders
-          }
+            headers: newRequestHeaders,
+          },
         });
 
         // Set newly generated sessionCarttId in the response cookies
-        response.cookies.set('sessionCartId', sessionCartId)
+        response.cookies.set('sessionCartId', sessionCartId);
 
         return response;
       } else {
