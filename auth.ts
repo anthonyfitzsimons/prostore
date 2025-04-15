@@ -10,7 +10,7 @@ import { NextResponse } from 'next/server';
 export const config = {
   pages: {
     signIn: '/sign-in',
-    error: 'sign-in',
+    error: '/sign-in',
   },
   session: {
     strategy: 'jwt',
@@ -111,6 +111,12 @@ export const config = {
           }
         }
       }
+
+      // Handle session updates
+      if (session?.user.name && trigger === 'update') {
+        token.name = session.user.name;
+      }
+
       return token;
     },
     authorized({ request, auth }: any) {
