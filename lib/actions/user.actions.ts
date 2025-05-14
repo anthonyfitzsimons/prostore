@@ -5,7 +5,6 @@ import {
   signInFormSchema,
   signUpFormSchema,
   paymentMethodSchema,
-  updateProfileSchema,
   updateUserSchema,
 } from '../validators';
 import { auth, signIn, signOut } from '@/auth';

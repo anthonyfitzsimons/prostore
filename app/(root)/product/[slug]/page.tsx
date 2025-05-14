@@ -8,7 +8,6 @@ import AddToCart from '@/components/shared/product/add-to-cart';
 import { getMyCart } from '@/lib/actions/cart.actions';
 import ReviewList from './review-list';
 import { auth } from '@/auth';
-import { Section } from 'lucide-react';
 import Rating from '@/components/shared/product/rating';
 
 const ProductsDetailsPage = async (props: {

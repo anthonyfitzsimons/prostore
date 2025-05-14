@@ -2,13 +2,11 @@ import { FormEvent, useState } from 'react';
 import { loadStripe } from '@stripe/stripe-js';
 import {
   Elements,
-  elements,
   LinkAuthenticationElement,
   PaymentElement,
   useElements,
   useStripe,
 } from '@stripe/react-stripe-js';
-import { Protest_Guerrilla } from 'next/font/google';
 import { useTheme } from 'next-themes';
 import { formatCurrency } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
