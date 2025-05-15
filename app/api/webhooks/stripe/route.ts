@@ -13,6 +13,7 @@ export async function POST(req: NextRequest) {
   // Check for successful payment
   if (event.type === 'charge.succeeded') {
     const { object } = event.data;
+    console.log("It got this far!")
 
     // Update order status
     await updateOrderToPaid({
