@@ -10,10 +10,11 @@ export async function POST(req: NextRequest) {
     process.env.STRIPE_WEBHOOK_SECRET as string
   );
 
+  console.log(event);
+
   // Check for successful payment
   if (event.type === 'charge.succeeded') {
     const { object } = event.data;
-    console.log("It got this far!")
 
     // Update order status
     await updateOrderToPaid({
